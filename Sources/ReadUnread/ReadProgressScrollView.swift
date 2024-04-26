@@ -14,7 +14,7 @@ public struct ReadProgressScrollView<Content: View, Readable: ReadUnreadable>: V
 	var readable: Readable
 	var content: () -> Content
 
-	public init(_ readable: Readable, content: @escaping () -> Content) {
+	public init(_ readable: Readable, @ViewBuilder content: @escaping () -> Content) {
 		self.readable = readable
 		self.content = content
 	}
