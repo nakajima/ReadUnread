@@ -22,11 +22,17 @@ public protocol ReadUnreadable: Identifiable where ID: Codable {
 	public var total: Int = 1
 	public var progress: Double = 0
 
-	init(readable: any ReadUnreadable) {
+	public init(readable: any ReadUnreadable) {
 		self.readableID = readable.readableID
 	}
 
-	@MainActor static func update<T: ReadUnreadable>(current: Int, total: Int, readable: T, in container: ModelContainer) throws {
+	@MainActor public static func current<T: ReadUnreadable>(for readable: T, in container: ModelContainer) throws -> Int? {
+		let readableID = readable.readableID
+		let descriptor = FetchDescriptor<ReadStatusRecord>(predicate: #Predicate { $0.readableID == readableID })
+		return try container.mainContext.fetch(descriptor).first?.current
+	}
+
+	@MainActor public static func update<T: ReadUnreadable>(current: Int, total: Int, readable: T, in container: ModelContainer) throws {
 		let readableID = readable.readableID
 		let descriptor = FetchDescriptor<ReadStatusRecord>(predicate: #Predicate { $0.readableID == readableID })
 		let record = try container.mainContext.fetch(descriptor).first ?? {
