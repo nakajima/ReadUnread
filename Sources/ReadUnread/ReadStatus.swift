@@ -58,6 +58,9 @@ public protocol ReadUnreadable: Identifiable where ID: Codable {
 	func body(content: Content) -> some View {
 		content
 			.scrollPosition(id: scrollObserver.position, anchor: .bottom)
+			.onDisappear {
+				try? ReadStatusRecord.update(current: scrollObserver.currentValue ?? 0, total: readable.readableSectionCount, readable: readable, in: modelContext.container)
+			}
 			.task(priority: .low) { @MainActor in
 				for await update in scrollObserver.stream() {
 					try? ReadStatusRecord.update(current: update, total: readable.readableSectionCount, readable: readable, in: modelContext.container)
