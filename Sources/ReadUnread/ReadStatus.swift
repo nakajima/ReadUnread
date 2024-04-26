@@ -46,6 +46,7 @@ public protocol ReadUnreadable: Identifiable where ID: Codable {
 
 @MainActor struct ReadStatusModifier<T: ReadUnreadable>: ViewModifier {
 	@Environment(\.modelContext) var modelContext
+	@Environment(\.scenePhase) var scenePhase
 
 	let readable: T
 	let scrollObserver: ScrollObserver<Int>
@@ -58,14 +59,28 @@ public protocol ReadUnreadable: Identifiable where ID: Codable {
 	func body(content: Content) -> some View {
 		content
 			.scrollPosition(id: scrollObserver.position, anchor: .bottom)
+			.onChange(of: scenePhase) {
+				if scenePhase != .active {
+					saveProgress()
+				}
+			}
 			.onDisappear {
-				try? ReadStatusRecord.update(current: scrollObserver.currentValue ?? 0, total: readable.readableSectionCount, readable: readable, in: modelContext.container)
+				saveProgress()
 			}
 			.task(priority: .low) { @MainActor in
 				for await update in scrollObserver.stream() {
-					try? ReadStatusRecord.update(current: update, total: readable.readableSectionCount, readable: readable, in: modelContext.container)
+					saveProgress(current: update)
 				}
 			}
+	}
+
+	private func saveProgress(current: Int? = nil) {
+		try? ReadStatusRecord.update(
+			current: current ?? scrollObserver.currentValue ?? 0,
+			total: readable.readableSectionCount,
+			readable: readable,
+			in: modelContext.container
+		)
 	}
 }
 
