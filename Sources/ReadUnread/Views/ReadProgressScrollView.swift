@@ -28,7 +28,7 @@ public struct ReadProgressScrollView<Content: View, Readable: ReadUnreadable>: V
 			.readStatus(for: readable)
 			.onAppear {
 				if let currentPosition = try? ReadStatusRecord.current(for: readable, in: modelContext.container) {
-					scroller.scrollTo(currentPosition, anchor: .zero)
+					scroller.scrollTo(currentPosition, anchor: .bottom)
 				}
 			}
 		}

@@ -19,7 +19,7 @@ public struct ForEachReadableSection<T, Content: View>: View {
 	public var body: some View {
 		ForEach(Array(sections.enumerated()), id: \.0) { i, section in
 			content(section)
-			ReadProgressMarker(id: i)
+				.readStatusSection(id: i)
 		}
 	}
 }

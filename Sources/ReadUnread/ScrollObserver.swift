@@ -24,26 +24,26 @@ public extension EnvironmentValues {
 }
 
 struct MaximumSet {
-	var first: Int?
+	var last: Int?
 	var storage: Set<Int> = []
 
 	mutating func insert(_ element: Int) {
 		storage.insert(element)
 
-		if let first, first > element {
-			self.first = element
-		} else if first == nil {
-			first = element
+		if let last, last < element {
+			self.last = element
+		} else if last == nil {
+			last = element
 		}
 	}
 
 	mutating func remove(_ element: Int) {
 		storage.remove(element)
 
-		if let first, element == first {
-			self.first = storage.sorted().first
-		} else if first == nil {
-			first = element
+		if let last, element == last {
+			self.last = storage.sorted().last
+		} else if last == nil {
+			last = element
 		}
 	}
 }
@@ -78,7 +78,7 @@ struct MaximumSet {
 	public func didShow(id: Int) {
 		set.insert(id)
 
-		if let max = set.first {
+		if let max = set.last {
 			continuation?.yield(max)
 		}
 	}
@@ -86,7 +86,7 @@ struct MaximumSet {
 	public func didHide(id: Int) {
 		set.remove(id)
 
-		if let max = set.first {
+		if let max = set.last {
 			continuation?.yield(max)
 		}
 	}
