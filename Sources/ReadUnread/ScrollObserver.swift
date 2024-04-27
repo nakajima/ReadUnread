@@ -80,6 +80,7 @@ struct MaximumSet {
 
 		if let max = set.last {
 			continuation?.yield(max)
+			currentValue = max
 		}
 	}
 
@@ -88,6 +89,7 @@ struct MaximumSet {
 
 		if let max = set.last {
 			continuation?.yield(max)
+			currentValue = max
 		}
 	}
 }
