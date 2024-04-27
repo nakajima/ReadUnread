@@ -16,14 +16,14 @@ public struct ReadProgressMarker: View {
 
 	public var body: some View {
 		Rectangle()
-			.fill(.clear)
+			.fill(.pink)
 			.frame(height: 1)
 			.id(id)
 	}
 }
 
 #if DEBUG
-#Preview {
-	ReadProgressMarker(id: 1)
-}
+	#Preview {
+		ReadProgressMarker(id: 1)
+	}
 #endif

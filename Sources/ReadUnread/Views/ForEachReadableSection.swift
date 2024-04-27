@@ -21,10 +21,5 @@ public struct ForEachReadableSection<T, Content: View>: View {
 			content(section)
 			ReadProgressMarker(id: i)
 		}
-
-		Rectangle()
-			.fill(.clear)
-			.frame(height: 64)
-			.id(sections.count + 1)
 	}
 }

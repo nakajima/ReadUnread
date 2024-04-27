@@ -1,5 +1,5 @@
 //
-//  ReadStatus.swift
+//  ReadStatusRecord.swift
 //
 //
 //  Created by Pat Nakajima on 4/25/24.
@@ -47,51 +47,5 @@ public protocol ReadUnreadable: Identifiable where ID: Codable {
 		record.progress = Double(current) / max(1, Double(total)) // Prevent divide by zero
 
 		try container.mainContext.save()
-	}
-}
-
-@MainActor struct ReadStatusModifier<T: ReadUnreadable>: ViewModifier {
-	@Environment(\.modelContext) var modelContext
-	@Environment(\.scenePhase) var scenePhase
-
-	let readable: T
-	let scrollObserver: ScrollObserver<Int>
-
-	init(readable: T) {
-		self.readable = readable
-		self.scrollObserver = ScrollObserver(debounce: .seconds(0.2))
-	}
-
-	func body(content: Content) -> some View {
-		content
-			.scrollPosition(id: scrollObserver.position, anchor: .bottom)
-			.onChange(of: scenePhase) {
-				if scenePhase != .active {
-					saveProgress()
-				}
-			}
-			.onDisappear {
-				saveProgress()
-			}
-			.task(priority: .low) { @MainActor in
-				for await update in scrollObserver.stream() {
-					saveProgress(current: update)
-				}
-			}
-	}
-
-	private func saveProgress(current: Int? = nil) {
-		try? ReadStatusRecord.update(
-			current: current ?? scrollObserver.currentValue ?? 0,
-			total: readable.readableSectionCount,
-			readable: readable,
-			in: modelContext.container
-		)
-	}
-}
-
-public extension View {
-	@MainActor func readStatus<T: ReadUnreadable>(for readable: T) -> some View {
-		modifier(ReadStatusModifier(readable: readable))
 	}
 }
